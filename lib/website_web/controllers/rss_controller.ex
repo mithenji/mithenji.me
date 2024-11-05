@@ -8,8 +8,8 @@ defmodule WebsiteWeb.RssController do
   alias Atomex.{Feed, Entry}
   alias Website.Blog
 
-  @author "Florian Arens"
-  @email "info@farens.me"
+  @author "Mithen Ji"
+  @email "jihonghuan20@gmail.com"
 
   def index(conn, _params) do
     articles = Blog.all_articles()
@@ -21,7 +21,7 @@ defmodule WebsiteWeb.RssController do
   end
 
   defp build_feed(articles) do
-    Feed.new(url(~p"/"), DateTime.utc_now(), "farens.me Blog")
+    Feed.new(url(~p"/"), DateTime.utc_now(), "mithenji.me Blog")
     |> Feed.author(@author, email: @email)
     |> Feed.link(url(~p"/rss.xml"), rel: "self")
     |> Feed.entries(Enum.map(articles, &get_entry/1))

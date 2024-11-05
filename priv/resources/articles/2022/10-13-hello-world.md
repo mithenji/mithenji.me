@@ -41,6 +41,6 @@ I did not think about a blog when I started creating this website. Initially it 
 
 I plan to add at least one blog post every couple of months, but don't take it too seriously. I don't know yet if it will be a purely technical blog, I'll probably write about anything that comes to mind.
 
-Let me know what you expect from this blog and what topics you are interested in. You can find my contact details on the [about page](https://farens.me/about) of this website. That's one of the reasons I created this website.
+Let me know what you expect from this blog and what topics you are interested in. You can find my contact details on the [about page](https://mithenji.me/about) of this website. That's one of the reasons I created this website.
 
 I would also love to hear from anyone who has read this first article to the end, so drop me a line anyway.

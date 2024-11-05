@@ -112,7 +112,7 @@ defmodule WebsiteWeb.CoreComponents do
     ~H"""
     <.link navigate={~p"/"} class="avatar cursor-pointer">
       <div class="h-10 w-auto rounded-full">
-        <img loading="lazy" src={~p"/images/me.jpg"} alt="Portrait of Florian" />
+        <img loading="lazy" src={~p"/images/me.png"} alt="Portrait of Mithen Ji" />
       </div>
     </.link>
     """
@@ -268,19 +268,11 @@ defmodule WebsiteWeb.CoreComponents do
   def contact_links(assigns) do
     ~H"""
     <div class={@class}>
-      <.link href="https://github.com/flo0807" target="_blank">
+      <.link href="https://github.com/mithenji" target="_blank">
         <span class="sr-only">GitHub Icon</span>
         <.github_icon class={@icon_class} />
       </.link>
-      <.link href="https://linkedin.com/in/florian-arens" target="_blank">
-        <span class="sr-only">LinkedIn Icon</span>
-        <.linkedin_icon class={@icon_class} />
-      </.link>
-      <.link href="https://x.com/flo_arens" target="_blank">
-        <span class="sr-only">X Icon</span>
-        <.x_icon class={@icon_class} />
-      </.link>
-      <.link href="mailto:info@farens.me">
+      <.link href="mailto:jihonghuan20@gmail.com">
         <span class="sr-only">Mail Icon</span>
         <.mail_icon class={@icon_class} />
       </.link>
@@ -537,7 +529,7 @@ defmodule WebsiteWeb.CoreComponents do
     <script
       :if={Application.get_env(:website, :env) == :prod}
       defer
-      data-domain="farens.me"
+      data-domain="mithenji.me"
       src="https://plausible.farens.me/js/script.js"
     >
     </script>
@@ -548,8 +540,8 @@ defmodule WebsiteWeb.CoreComponents do
     [
       %{label: "Home", to: ~p"/"},
       %{label: "About", to: ~p"/about"},
-      %{label: "Blog", to: ~p"/blog"},
-      %{label: "Projects", to: ~p"/projects"}
+#      %{label: "Blog", to: ~p"/blog"},
+#      %{label: "Projects", to: ~p"/projects"}
     ]
   end
 

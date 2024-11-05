@@ -18,9 +18,9 @@ defmodule WebsiteWeb.SEO do
       creator: "@flo_arens",
       title: conn.assigns.page_title,
       card: :summary_large_image,
-      image: "https://og-image.farens.me/image?text=#{conn.assigns[:og_image_text]}",
+      image: "https://og-image.mithenji.me/image?text=#{conn.assigns[:og_image_text]}",
       description:
-        "Personal website and blog of Florian Arens, a software developer and computer science student."
+        "Personal website and blog of Mithen Ji, a software developer and computer science student."
     )
   end
 
@@ -31,7 +31,7 @@ defmodule WebsiteWeb.SEO do
     SEO.OpenGraph.build(
       title: conn.assigns.page_title,
       description:
-        "Personal website and blog of Florian Arens, a software developer and computer science student.",
+        "Personal website and blog of Mithen Ji, a software developer and computer science student.",
       locale: "en_US",
       image: "https://og-image.farens.me/image?text=#{conn.assigns[:og_image_text]}",
       url: conn.assigns.current_url
@@ -45,7 +45,7 @@ defmodule WebsiteWeb.SEO do
     SEO.Site.build(
       canonical_url: conn.assigns.current_url,
       description:
-        "Personal website and blog of Florian Arens, a software developer and computer science student."
+        "Personal website and blog of Mithen Ji, a software developer and computer science student."
     )
   end
 end

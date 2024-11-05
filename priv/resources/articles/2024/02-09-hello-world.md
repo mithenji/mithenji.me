@@ -24,7 +24,7 @@ Sounds a bit overkill for a simple blog, doesn't it? So why are these technologi
 
 Because Elixir and Phoenix make building web applications so much fun. Over the past two years, Elixir has become one of my favorite programming languages. So of course I used these technologies to build my website. In my opinion, Phoenix and Elixir are good choices even for such small projects. I am always open to new frameworks and programming languages and have used many in past projects, but currently I really stick to Elixir and Phoenix. Also, it's cool to have a playground and project where I can try out new features and experiment with the framework and language.
 
-If you are interested in the source code of this website and blog, it is available to the public on GitHub ([https://github.com/Flo0807/farens.me](https://github.com/Flo0807/farens.me)).
+If you are interested in the source code of this website and blog, it is available to the public on GitHub ([https://github.com/mithenji/mithenji.me](https://github.com/mithenji/mithenji.me)).
 
 Let's dive in even deeper and discuss how certain features are built.
 
