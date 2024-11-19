@@ -2,6 +2,7 @@ name: CI
 
 on:
   push:
+    branches: [ 'main' ]
 
 env:
   REGISTRY: ghcr.io
@@ -15,16 +16,16 @@ jobs:
       MIX_ENV: test
 
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - uses: actions/checkout@latest
 
-      - uses: erlef/setup-beam@5304e04ea2b355f03681464e683d92e3b2f18451 # v1
+      - uses: erlef/setup-beam@latest
         id: beam
         with:
           version-file: .tool-versions
           version-type: strict
 
       - name: Restore the deps and _build cache
-        uses: actions/cache@6849a6489940f00c2f30c0fb92c6274307ccb58a # v4
+        uses: actions/cache@latest
         id: restore-cache
         env:
           OTP_VERSION: ${{ steps.beam.outputs.otp-version }}
@@ -69,29 +70,29 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        uses: actions/checkout@latest
 
       - name: Lowercase image name
         run: echo "IMAGE_NAME=$(echo "$IMAGE_NAME" | awk '{print tolower($0)}')" >> $GITHUB_ENV
 
       - name: Log in to the container registry
-        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3
+        uses: docker/login-action@latest # v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets._GITHUB_TOKEN }}
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@c47758b77c9736f4b2ef4073d4d51994fabfe349 # v3
+        uses: docker/setup-buildx-action@latest
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81 # v5
+        uses: docker/metadata-action@latest
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
       - name: Build and push
-        uses: docker/build-push-action@4f58ea79222b3b9dc2c8bbdd6debcef730109a75 # v6
+        uses: docker/build-push-action@latest
         with:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
@@ -99,20 +100,28 @@ jobs:
           cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
           cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
   deploy:
-      if: github.ref == 'refs/heads/main'
-      name: Deploy app
-      needs: build
-      runs-on: ubuntu-latest
-      steps:
-      - name: Trigger deployment
+    if: github.ref == 'refs/heads/main'
+    name: Deploy to Alibaba Cloud ECS
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH to remote server and deploy
+        env:
+          HOST: ${{ secrets.ECS_HOST }}
+          USER: ${{ secrets.ECS_USER }}
+          SSH_KEY: ${{ secrets.ECS_SSH_KEY }}
         run: |
-          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" -X POST ${{ secrets.WEBHOOK_URL }} \
-            -H "Content-Type: application/json" \
-            -H "X-Signature: ${{ secrets.WEBHOOK_SECRET }}" \
-            -d '{}')
-          if [ "$RESPONSE" -ne "200" ]
-          then
-            echo "Deployment failed with status ${RESPONSE}"
-            exit 1
-          fi
-
+          eval "$(ssh-agent -s)"
+          echo "$SSH_KEY" | tr -d '\r' | ssh-add -
+          ssh -o StrictHostKeyChecking=no $USER@$HOST << 'EOF'
+            # 停止并删除旧容器（如果存在）
+            docker stop ${{ env.IMAGE_NAME }} || true
+            docker rm ${{ env.IMAGE_NAME }} || true
+            
+            # 拉取最新镜像
+            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            
+            # 运行新容器
+            docker run -d --name ${{ env.IMAGE_NAME }} -p 80:80 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          EOF  
+    
