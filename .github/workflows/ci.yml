@@ -80,7 +80,7 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets._GITHUB_TOKEN }}
+          password: ${{ secrets.GHCR_TOKEN }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@c47758b77c9736f4b2ef4073d4d51994fabfe349 # v3
@@ -105,31 +105,25 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Log in to the container registry
-        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets._GITHUB_TOKEN }}
-
       - name: SSH to remote server and deploy
         env:
           HOST: ${{ secrets.ECS_HOST }}
           USER: ${{ secrets.ECS_USER }}
           SSH_KEY: ${{ secrets.ECS_SSH_KEY }}
+          DOCKER_PASSWORD: ${{ secrets.GHCR_TOKEN }}
         run: |
           eval "$(ssh-agent -s)"
           echo "$SSH_KEY" | tr -d '\r' | ssh-add -
           ssh -o StrictHostKeyChecking=no $USER@$HOST << 'EOF'
             # 停止并删除旧容器（如果存在）
-            docker stop ${{ env.IMAGE_NAME }} || true
-            docker rm ${{ env.IMAGE_NAME }} || true
+            docker stop mithenji.me|| true
+            docker rm mithenji.me || true
 
             # 登录并拉取最新镜像
-            echo "$_GITHUB_TOKEN" | docker login ghcr.io -u mithenji --password-stdin
-            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            echo $DOCKER_PASSWORD | docker login ghcr.io -u mithenji --password-stdin
+            docker pull ghcr.io/mithenji/mithenji.me:buildcache
 
             # 运行新容器
-            docker run -d --name ${{ env.IMAGE_NAME }} -p 80:80 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            docker run -d --name ${{ env.IMAGE_NAME }} -p 80:80 ghcr.io/mithenji/mithenji.me:buildcache
           EOF
 
