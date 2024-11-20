@@ -111,17 +111,6 @@ jobs:
       DOCKER_PASSWORD: ${{ secrets.GHCR_TOKEN }}
 
     steps:
-      - name: Download tags file
-        uses: actions/download-artifact@v3
-        with:
-          name: docker-tags
-          path: ./tags
-
-      - name: Read tag from file
-        run: |
-          SINGLE_TAG=$(cat ./tags/tags.txt | cut -d ',' -f 1)
-          echo "SINGLE_TAG=$SINGLE_TAG" >> $GITHUB_ENV
-
       - name: Log in to the container registry
         uses: docker/login-action@v3
         with:
@@ -134,7 +123,7 @@ jobs:
           eval "$(ssh-agent -s)"
           echo "$SSH_KEY" | tr -d '\r' | ssh-add -
           ssh -o StrictHostKeyChecking=no $USER@$HOST << EOF
-            IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$SINGLE_TAG
+            IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tags }}
 
             # Stop and remove old container if exists
             docker ps -a | grep 'mithenji.me' && docker stop mithenji.me || true
