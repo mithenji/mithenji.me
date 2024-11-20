@@ -105,10 +105,10 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     env:
-      HOST: ${{ secrets.ECS_HOST }}   # 服务器地址
-      USER: ${{ secrets.ECS_USER }}   # 服务器用户名
-      SSH_KEY: ${{ secrets.ECS_SSH_KEY }}  # SSH 密钥
-      DOCKER_PASSWORD: ${{ secrets.GHCR_TOKEN }}  # Docker 密码
+      HOST: ${{ secrets.ECS_HOST }}
+      USER: ${{ secrets.ECS_USER }}
+      SSH_KEY: ${{ secrets.ECS_SSH_KEY }}
+      DOCKER_PASSWORD: ${{ secrets.GHCR_TOKEN }}
     steps:
       - name: Log in to the container registry
         uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3
@@ -117,22 +117,25 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}
 
+      - name: Debug tags
+        run:
+          echo "Tags: ${{ steps.meta.outputs.tags }}"
+
+      - name: Extract single tag
+        run: echo "SINGLE_TAG=$(echo ${{ steps.meta.outputs.tags }} | cut -d ',' -f 1)" >> $GITHUB_ENV
+
       - name: Deploy to ECS via SSH
-        env:
-          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
         run: |
           eval "$(ssh-agent -s)"
           echo "$SSH_KEY" | tr -d '\r' | ssh-add -
-          ssh -o StrictHostKeyChecking=no $USER@$HOST << 'EOF'
-            # 停止并删除旧容器（如果存在）
+          ssh -o StrictHostKeyChecking=no $USER@$HOST << EOF
+            IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$SINGLE_TAG
+
+            # Stop and remove old container if exists
             docker ps -a | grep 'mithenji.me' && docker stop mithenji.me || true
             docker ps -a | grep 'mithenji.me' && docker rm mithenji.me || true
 
-            # 配置 Docker 登录凭证
-            mkdir -p ~/.docker
-            echo '{"auths":{"ghcr.io":{"auth":"'"$(echo -n "mithenji:$GHCR_TOKEN" | base64)"'"}}}' > ~/.docker/config.json
-
-            # 拉取最新镜像并启动
-            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tags }}
-            docker run -d --name mithenji.me -p 80:80 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tags }}
+            # Pull and run the new image
+            docker pull $IMAGE
+            docker run -d --name mithenji.me -p 80:80 $IMAGE
           EOF
