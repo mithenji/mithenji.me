@@ -123,7 +123,11 @@ jobs:
           eval "$(ssh-agent -s)"
           echo "$SSH_KEY" | tr -d '\r' | ssh-add -
           ssh -o StrictHostKeyChecking=no $USER@$HOST << EOF
-            IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tags }}
+            # Ensure IMAGE has the correct tag
+            IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tags || 'latest' }}
+
+            # Debug IMAGE variable
+            echo "Deploying image: $IMAGE"
 
             # Stop and remove old container if exists
             docker ps -a | grep 'mithenji.me' && docker stop mithenji.me || true
@@ -133,3 +137,4 @@ jobs:
             docker pull $IMAGE
             docker run -d --name mithenji.me -p 80:80 $IMAGE
           EOF
+
