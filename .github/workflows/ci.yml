@@ -126,7 +126,7 @@ jobs:
             docker rm ${{ env.IMAGE_NAME }} || true
 
             # 登录并拉取最新镜像
-            echo "$_GITHUB_TOKEN" | docker login ghcr.io -u $USER --password-stdin
+            echo "$_GITHUB_TOKEN" | docker login ghcr.io -u mithenji --password-stdin
             docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
             # 运行新容器
