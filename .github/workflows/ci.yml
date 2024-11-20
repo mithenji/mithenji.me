@@ -109,20 +109,25 @@ jobs:
       USER: ${{ secrets.ECS_USER }}
       SSH_KEY: ${{ secrets.ECS_SSH_KEY }}
       DOCKER_PASSWORD: ${{ secrets.GHCR_TOKEN }}
+
     steps:
+      - name: Download tags file
+        uses: actions/download-artifact@v3
+        with:
+          name: docker-tags
+          path: ./tags
+
+      - name: Read tag from file
+        run: |
+          SINGLE_TAG=$(cat ./tags/tags.txt | cut -d ',' -f 1)
+          echo "SINGLE_TAG=$SINGLE_TAG" >> $GITHUB_ENV
+
       - name: Log in to the container registry
-        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3
+        uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}
-
-      - name: Debug tags
-        run:
-          echo "Tags: ${{ steps.meta.outputs.tags }}"
-
-      - name: Extract single tag
-        run: echo "SINGLE_TAG=$(echo ${{ steps.meta.outputs.tags }} | cut -d ',' -f 1)" >> $GITHUB_ENV
 
       - name: Deploy to ECS via SSH
         run: |
