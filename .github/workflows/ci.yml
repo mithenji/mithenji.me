@@ -127,7 +127,7 @@ jobs:
             docker ps -a | grep 'mithenji.me' && docker rm mithenji.me || true
 
             # 登录并拉取最新镜像
-            echo $DOCKER_PASSWORD | docker login ghcr.io -u mithenji --password-stdin
+            echo $GHCR_TOKEN | docker login ghcr.io -u mithenji --password-stdin
             docker pull ghcr.io/mithenji/mithenji.me:buildcache
 
             # 运行新容器
