@@ -128,8 +128,8 @@ jobs:
 
             # 登录并拉取最新镜像
             echo $DOCKER_PASSWORD | docker login ghcr.io -u mithenji --password-stdin
-            docker pull ghcr.io/mithenji/mithenji.me:${{ steps.meta.outputs.tags }}
+            docker pull ghcr.io/mithenji/mithenji.me:buildcache
 
             # 运行新容器
-            docker run -d --name ${{ env.IMAGE_NAME }} -p 80:80 ghcr.io/mithenji/mithenji.me:${{ steps.meta.outputs.tags }}
+            docker run -d --name mithenji.me -p 80:80 ghcr.io/mithenji/mithenji.me:buildcache
           EOF
