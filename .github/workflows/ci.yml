@@ -99,41 +99,41 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
           cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
-  deploy:
-    if: github.ref == 'refs/heads/main'
-    name: Deploy to Alibaba Cloud ECS
-    needs: build
-    runs-on: ubuntu-latest
-    env:
-      HOST: ${{ secrets.ECS_HOST }}
-      USER: ${{ secrets.ECS_USER }}
-      SSH_KEY: ${{ secrets.ECS_SSH_KEY }}
-      DOCKER_PASSWORD: ${{ secrets.GHCR_TOKEN }}
-
-    steps:
-      - name: Log in to the container registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_TOKEN }}
-
-      - name: Deploy to ECS via SSH
-        run: |
-          eval "$(ssh-agent -s)"
-          echo "$SSH_KEY" | tr -d '\r' | ssh-add -
-          ssh -o StrictHostKeyChecking=no $USER@$HOST << EOF
-            # Ensure IMAGE has the correct tag
-            IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tags || 'latest' }}
-
-            # Debug IMAGE variable to make sure it's not empty
-            echo "Deploying image: $IMAGE"
-
-            # Stop and remove old container if exists
-            docker ps -a | grep 'mithenji.me' && docker stop mithenji.me || true
-            docker ps -a | grep 'mithenji.me' && docker rm mithenji.me || true
-
-            # Pull and run the new image
-            docker pull ghcr.io/mithenji/mithenji.me:main
-            docker run -d --name mithenji.me -p 80:80 ghcr.io/mithenji/mithenji.me:main
-          EOF
+#  deploy:
+#    if: github.ref == 'refs/heads/main'
+#    name: Deploy to Alibaba Cloud ECS
+#    needs: build
+#    runs-on: ubuntu-latest
+#    env:
+#      HOST: ${{ secrets.ECS_HOST }}
+#      USER: ${{ secrets.ECS_USER }}
+#      SSH_KEY: ${{ secrets.ECS_SSH_KEY }}
+#      DOCKER_PASSWORD: ${{ secrets.GHCR_TOKEN }}
+#
+#    steps:
+#      - name: Log in to the container registry
+#        uses: docker/login-action@v3
+#        with:
+#          registry: ${{ env.REGISTRY }}
+#          username: ${{ github.actor }}
+#          password: ${{ secrets.GHCR_TOKEN }}
+#
+#      - name: Deploy to ECS via SSH
+#        run: |
+#          eval "$(ssh-agent -s)"
+#          echo "$SSH_KEY" | tr -d '\r' | ssh-add -
+#          ssh -o StrictHostKeyChecking=no $USER@$HOST << EOF
+#            # Ensure IMAGE has the correct tag
+#            IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tags || 'latest' }}
+#
+#            # Debug IMAGE variable to make sure it's not empty
+#            echo "Deploying image: $IMAGE"
+#
+#            # Stop and remove old container if exists
+#            docker ps -a | grep 'mithenji.me' && docker stop mithenji.me || true
+#            docker ps -a | grep 'mithenji.me' && docker rm mithenji.me || true
+#
+#            # Pull and run the new image
+#            docker pull ghcr.io/mithenji/mithenji.me:main
+#            docker run -d --name mithenji.me -p 80:80 ghcr.io/mithenji/mithenji.me:main
+#          EOF
