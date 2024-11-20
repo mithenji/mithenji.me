@@ -126,7 +126,7 @@ jobs:
             # Ensure IMAGE has the correct tag
             IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tags || 'latest' }}
 
-            # Debug IMAGE variable
+            # Debug IMAGE variable to make sure it's not empty
             echo "Deploying image: $IMAGE"
 
             # Stop and remove old container if exists
@@ -134,7 +134,6 @@ jobs:
             docker ps -a | grep 'mithenji.me' && docker rm mithenji.me || true
 
             # Pull and run the new image
-            docker pull $IMAGE
-            docker run -d --name mithenji.me -p 80:80 $IMAGE
+            docker pull ghcr.io/mithenji/mithenji.me:main
+            docker run -d --name mithenji.me -p 80:80 ghcr.io/mithenji/mithenji.me:main
           EOF
-
