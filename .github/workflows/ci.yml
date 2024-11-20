@@ -111,6 +111,7 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets._GITHUB_TOKEN }}
+
       - name: SSH to remote server and deploy
         env:
           HOST: ${{ secrets.ECS_HOST }}
@@ -124,7 +125,8 @@ jobs:
             docker stop ${{ env.IMAGE_NAME }} || true
             docker rm ${{ env.IMAGE_NAME }} || true
 
-            # 拉取最新镜像
+            # 登录并拉取最新镜像
+            echo "$_GITHUB_TOKEN" | docker login ghcr.io -u $USER --password-stdin
             docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
             # 运行新容器
