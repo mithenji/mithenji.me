@@ -118,6 +118,8 @@ jobs:
           password: ${{ secrets.GHCR_TOKEN }}
 
       - name: Deploy to ECS via SSH
+        env:
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
         run: |
           eval "$(ssh-agent -s)"
           echo "$SSH_KEY" | tr -d '\r' | ssh-add -
