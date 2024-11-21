@@ -84,6 +84,7 @@ RUN chown nobody /app
 
 # set runner ENV
 ENV MIX_ENV="prod"
+ENV SECRET_KEY_BASE=N0Sb4y4JZBHwJ2RmyUOf8I8TFTi5fa2/kOhuNdJPO72DDxI9pt+a0/sRqtOVaSKx
 
 # Only copy the final release from the build stage
 COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/website ./

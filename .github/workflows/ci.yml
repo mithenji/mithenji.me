@@ -135,5 +135,5 @@ jobs:
 #
 #            # Pull and run the new image
 #            docker pull ghcr.io/mithenji/mithenji.me:main
-#            docker run -d --name mithenji.me -p 80:80 ghcr.io/mithenji/mithenji.me:main
+#            docker run -d --name mithenji.me --env-file .env -p 80:80 ghcr.io/mithenji/mithenji.me:main
 #          EOF
