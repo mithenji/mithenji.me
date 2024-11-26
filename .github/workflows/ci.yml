@@ -122,24 +122,37 @@ jobs:
           ssh -o StrictHostKeyChecking=no $USER@$HOST << EOF
             # 使用确定的镜像标签
             IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ env.IMAGE_TAG }}
-
-            echo "Deploying image: \$IMAGE"
-
-            # 登录 Docker registry
-            echo "${{ secrets.GHCR_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
             
-            # 停止并删除旧容器
-            docker ps -a | grep 'mithenji.me' && docker stop mithenji.me || true
-            docker ps -a | grep 'mithenji.me' && docker rm mithenji.me || true
+            echo "Debug information:"
+            echo "Registry: ${{ env.REGISTRY }}"
+            echo "Image name: ${{ env.IMAGE_NAME }}"
+            echo "Image tag: ${{ env.IMAGE_TAG }}"
+            echo "Full image path: \$IMAGE"
+            
+            # 检查可用的镜像标签
+            echo "Available tags for this repository:"
+            docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin <<< "${{ secrets.GHCR_TOKEN }}"
+            curl -s -H "Authorization: Bearer ${{ secrets.GHCR_TOKEN }}" \
+              "https://ghcr.io/v2/${{ env.IMAGE_NAME }}/tags/list" | jq .
+            
+            echo "Attempting to pull image: \$IMAGE"
+            if docker pull \$IMAGE; then
+              echo "Successfully pulled image"
+              
+              # 停止并删除旧容器
+              docker ps -a | grep 'mithenji.me' && docker stop mithenji.me || true
+              docker ps -a | grep 'mithenji.me' && docker rm mithenji.me || true
 
-            # 拉取新镜像
-            docker pull \$IMAGE || exit 1
+              # 运行新容器
+              docker run -d --name mithenji.me \
+                --env-file /home/mithenji/.env \
+                -p 80:4000 \
+                \$IMAGE
 
-            docker run -d --name mithenji.me \
-              --env-file /home/mithenji/.env \
-              -p 80:4000 \
-              \$IMAGE
-
-            # 验证容器是否正在运行
-            docker ps | grep mithenji.me
+              # 验证容器是否正在运行
+              docker ps | grep mithenji.me
+            else
+              echo "Failed to pull image"
+              exit 1
+            fi
           EOF
