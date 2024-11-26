@@ -121,7 +121,7 @@ jobs:
           echo "$SSH_KEY" | tr -d '\r' | ssh-add -
           ssh -o StrictHostKeyChecking=no $USER@$HOST << EOF
             # 使用确定的镜像标签
-            IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+            IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ env.IMAGE_TAG }}
 
             echo "Deploying image: \$IMAGE"
 
@@ -131,5 +131,8 @@ jobs:
             docker ps -a | grep 'mithenji.me' && docker rm mithenji.me || true
 
             docker pull \$IMAGE
-            docker run -d --name mithenji.me \--env-file .env \-p 80:4000 \$IMAG
+            docker run -d --name mithenji.me \
+              --env-file .env \
+              -p 80:4000 \
+              \$IMAGE
           EOF
