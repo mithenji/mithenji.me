@@ -18,7 +18,7 @@ FROM ${BUILDER_IMAGE} AS builder
 
 # install build dependencies
 RUN apt-get update && apt-get install -y curl
-RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
+RUN curl -sL https://deb.nodesource.com/setup_20.x | bash -
 RUN apt-get install -y nodejs git build-essential
 RUN apt-get clean && rm -f /var/lib/apt/lists/*_*
 
@@ -69,7 +69,7 @@ RUN mix release
 # the compiled release and other runtime necessities
 FROM ${RUNNER_IMAGE}
 
-RUN apt-get update -y && apt-get install -y libstdc++6 openssl libncurses5 locales \
+RUN apt-get update -y && apt-get install -y libstdc++6 openssl libncurses5 locales curl \
   && apt-get clean && rm -f /var/lib/apt/lists/*_*
 
 # Set the locale
@@ -80,11 +80,12 @@ ENV LANGUAGE=en_US:en
 ENV LC_ALL=en_US.UTF-8
 
 WORKDIR "/app"
-RUN chown nobody /app
+RUN chown nobody:nobody /app
 
 # set runner ENV
 ENV MIX_ENV="prod"
-ENV SECRET_KEY_BASE=N0Sb4y4JZBHwJ2RmyUOf8I8TFTi5fa2/kOhuNdJPO72DDxI9pt+a0/sRqtOVaSKx
+ENV PHX_HOST=${PHX_HOST}
+ENV SECRET_KEY_BASE=${SECRET_KEY_BASE}
 
 # Only copy the final release from the build stage
 COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/website ./
@@ -92,3 +93,6 @@ COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/website ./
 USER nobody
 
 CMD ["/app/bin/server"]
+
+HEALTHCHECK --interval=30s --timeout=3s \
+  CMD curl -f http://localhost:${PORT:-4000}/ || exit 1
