@@ -131,5 +131,5 @@ jobs:
             docker ps -a | grep 'mithenji.me' && docker rm mithenji.me || true
 
             docker pull \$IMAGE
-            docker run -d --name mithenji.me \--env-file .env \-p 8080:80 \$IMAG
+            docker run -d --name mithenji.me \--env-file .env \-p 80:4000 \$IMAG
           EOF
