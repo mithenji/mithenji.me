@@ -121,19 +121,15 @@ jobs:
           echo "$SSH_KEY" | tr -d '\r' | ssh-add -
           ssh -o StrictHostKeyChecking=no $USER@$HOST << EOF
             # 使用确定的镜像标签
-            IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ env.IMAGE_TAG }}
+            IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main
             
             echo "Debug information:"
             echo "Registry: ${{ env.REGISTRY }}"
             echo "Image name: ${{ env.IMAGE_NAME }}"
-            echo "Image tag: ${{ env.IMAGE_TAG }}"
             echo "Full image path: \$IMAGE"
             
-            # 检查可用的镜像标签
-            echo "Available tags for this repository:"
-            docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin <<< "${{ secrets.GHCR_TOKEN }}"
-            curl -s -H "Authorization: Bearer ${{ secrets.GHCR_TOKEN }}" \
-              "https://ghcr.io/v2/${{ env.IMAGE_NAME }}/tags/list" | jq .
+            # 登录 Docker registry
+            echo "${{ secrets.GHCR_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
             
             echo "Attempting to pull image: \$IMAGE"
             if docker pull \$IMAGE; then
