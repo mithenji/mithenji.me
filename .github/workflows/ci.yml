@@ -117,6 +117,11 @@ jobs:
     steps:
       - name: Deploy to ECS via SSH
         run: |
+          # 配置 SSH 以保持连接活跃
+          mkdir -p ~/.ssh
+          echo "ServerAliveInterval 30" >> ~/.ssh/config
+          echo "ServerAliveCountMax 60" >> ~/.ssh/config
+          
           eval "$(ssh-agent -s)"
           echo "$SSH_KEY" | tr -d '\r' | ssh-add -
           ssh -o StrictHostKeyChecking=no $USER@$HOST << EOF
