@@ -147,7 +147,7 @@ jobs:
               # 运行新容器
               docker run -d --name mithenji.me \
                 --env-file /home/mithenji/.env \
-                -p 4000:4000 \
+                -p 8080:80 \
                 \$IMAGE
 
               # 验证容器是否正在运行

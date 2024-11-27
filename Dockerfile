@@ -93,6 +93,3 @@ COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/website ./
 USER nobody
 
 CMD ["/app/bin/server"]
-
-HEALTHCHECK --interval=30s --timeout=3s \
-  CMD curl -f http://localhost:${PORT:-4000}/ || exit 1
