@@ -34,7 +34,7 @@ if config_env() == :prod do
       """
 
   host = System.get_env("PHX_HOST") || "mithenji.me"
-  port = String.to_integer(System.get_env("PORT") || "8080")
+  port = String.to_integer(System.get_env("PORT") || "80")
 
   config :website, WebsiteWeb.Endpoint,
     url: [host: host, port: 443, scheme: "https"],
