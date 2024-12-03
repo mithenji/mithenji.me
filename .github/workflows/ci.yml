@@ -128,8 +128,8 @@ jobs:
           eval "$(ssh-agent -s)"
           echo "$SSH_KEY" | tr -d '\r' | ssh-add -
           ssh -o StrictHostKeyChecking=no $USER@$HOST << EOF
-            # 使用确定的镜像标签
-            IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main
+            # 使用提交 SHA 作为镜像标签以确保部署确定性
+            IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-$(echo ${{ github.sha }} | cut -c1-7)
             
             echo "Debug information:"
             echo "Registry: ${{ env.REGISTRY }}"
