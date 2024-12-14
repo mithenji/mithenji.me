@@ -140,24 +140,12 @@ jobs:
             # 登录 Docker registry
             echo "${{ secrets.GHCR_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
             
-            echo "Attempting to pull image: \$IMAGE"
-            if docker pull \$IMAGE; then
-              echo "Successfully pulled image"
-              
-              # 停止并删除旧容器
-              docker ps -a | grep 'mithenji.me' && docker stop mithenji.me || true
-              docker ps -a | grep 'mithenji.me' && docker rm mithenji.me || true
-
-              # 运行新容器
-              docker run -d --name mithenji.me \
-                --env-file /home/mithenji/.env \
-                -p 8080:80 \
-                \$IMAGE
-
-              # 验证容器是否正在运行
-              docker ps | grep mithenji.me
-            else
-              echo "Failed to pull image"
-              exit 1
-            fi
+            # 设置环境变量供 docker-compose 使用
+            export IMAGE_NAME=\$IMAGE
+            
+            # 指定工作目录
+            cd /home/mithenji/
+            
+            docker-compose pull
+            docker-compose up -d --remove-orphans
           EOF
