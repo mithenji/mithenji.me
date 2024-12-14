@@ -145,7 +145,16 @@ jobs:
             
             # 指定工作目录
             cd /home/mithenji/
+
+            echo "停止并删除旧容器..."
+            docker-compose down
             
+            echo "拉取最新镜像..."
             docker-compose pull
+            
+            echo "更新服务..."
             docker-compose up -d --remove-orphans
+            
+            echo "清理未使用的镜像..."
+            docker image prune -f
           EOF
