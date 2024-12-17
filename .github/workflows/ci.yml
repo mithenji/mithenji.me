@@ -157,5 +157,5 @@ jobs:
             docker-compose up -d mithenji.me
             
             echo "清理未使用的镜像..."
-            docker images "ghcr.io/mithenji/mithenji.me" --format "{{.ID}}" | xargs -r docker rmi
+            docker images "ghcr.io/mithenji/mithenji.me" --format "{{.ID}}" | grep -v $(docker inspect --format='{{.Image}}' mithenji.me) | xargs -r docker rmi
           EOF
