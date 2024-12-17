@@ -147,15 +147,15 @@ jobs:
             cd /home/mithenji/
 
             echo "停止并删除旧容器..."
-            docker-compose down --remove-orphans
-            docker rm -f mithenji.me || true
+            docker-compose stop mithenji.me
+            docker-compose rm -f mithenji.me
             
             echo "拉取最新镜像..."
-            docker-compose pull
+            docker-compose pull mithenji.me
             
             echo "更新服务..."
-            docker-compose up -d --remove-orphans
+            docker-compose up -d mithenji.me
             
             echo "清理未使用的镜像..."
-            docker image prune -f
+            docker images | grep mithenji.me | awk '{print $3}' | xargs -r docker rmi
           EOF
