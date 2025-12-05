@@ -22,25 +22,14 @@ config :website, WebsiteWeb.Endpoint,
   pubsub_server: Website.PubSub,
   live_view: [signing_salt: "RrqkD/ph"]
 
-# Configure esbuild (the version is required)
-config :esbuild,
-  version: "0.0.0",
-  path: Path.expand("../assets/node_modules/.bin/esbuild", __DIR__),
-  default: [
-    args:
-      ~w(js/app.js --bundle --target=es2017 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),
-    cd: Path.expand("../assets", __DIR__),
-    env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
-  ]
-
 # Configure tailwind (the version is required)
 config :tailwind,
-  version: "0.0.0",
+  version: "3.4.14",
   path: Path.expand("../assets/node_modules/.bin/tailwind", __DIR__),
   default: [
     args: ~w(
-    --config=tailwind.config.js
-    --input=css/app.css
+    --config=main/tailwind.config.js
+    --input=main/styles/app.css
     --output=../priv/static/assets/app.css
   ),
     cd: Path.expand("../assets", __DIR__)

@@ -11,6 +11,8 @@ defmodule Website.Application do
       WebsiteWeb.Telemetry,
       {DNSCluster, query: Application.get_env(:website, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Website.PubSub},
+      # Finch HTTP client with connection pool for Nextra proxy
+      {Finch, name: Website.Finch, pools: %{default: [size: 10, count: 1]}},
       WebsiteWeb.Presence,
       WebsiteWeb.Endpoint
     ]

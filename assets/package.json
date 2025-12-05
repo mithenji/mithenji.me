@@ -1,11 +1,29 @@
 {
-  "dependencies": {
-    "topbar": "^3.0.0"
+  "name": "website-assets",
+  "private": true,
+  "workspaces": [
+    "main",
+    "shared",
+    "livebooks/*"
+  ],
+  "scripts": {
+    "dev": "rspack build --watch --config rspack.config.js",
+    "dev:main": "rspack build --watch --config rspack.config.js --env target=main",
+    "build": "rspack build --config rspack.config.js",
+    "build:main": "rspack build --config rspack.config.js --env target=main",
+    "build:livebooks": "rspack build --config rspack.config.js --env target=livebooks",
+    "build:livebook": "rspack build --config rspack.config.js --env target=livebook --env name",
+    "new:livebook": "node scripts/new-livebook.js"
   },
   "devDependencies": {
-    "@tailwindcss/typography": "0.5.15",
-    "daisyui": "4.12.14",
-    "esbuild": "0.24.0",
-    "tailwindcss": "3.4.14"
+    "@rspack/cli": "^1.1.6",
+    "@rspack/core": "^1.1.6",
+    "@tailwindcss/typography": "^0.5.15",
+    "autoprefixer": "^10.4.20",
+    "concurrently": "^9.1.0",
+    "daisyui": "^4.12.14",
+    "postcss": "^8.4.49",
+    "postcss-loader": "^8.1.1",
+    "tailwindcss": "^3.4.14"
   }
 }

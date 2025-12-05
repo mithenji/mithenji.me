@@ -5,7 +5,7 @@ import Config
 #
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we use it
-# with esbuild to bundle .js and .css sources.
+# with Rspack to bundle .js and .css sources.
 config :website, WebsiteWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
@@ -15,9 +15,16 @@ config :website, WebsiteWeb.Endpoint,
   debug_errors: true,
   secret_key_base: "n3ca9fTj7Q5Ez6IdRIh6aYUVBjaqTJwWRBlGRE1ypmvOv7Q1TxPKKPp0obBbkBIx",
   watchers: [
-    # Start the esbuild watcher by calling Esbuild.install_and_run(:default, args)
-    esbuild:
-      {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch --loader:.ttf=file)]},
+    # Rspack watcher for main Phoenix assets
+    npx: [
+      "rspack",
+      "build",
+      "--watch",
+      "--config",
+      "rspack.config.js",
+      cd: Path.expand("../assets", __DIR__)
+    ],
+    # Tailwind watcher
     tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]}
   ]
 

@@ -16,7 +16,7 @@ defmodule Website.MixProject do
   def application do
     [
       mod: {Website.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :inets, :ssl]
     ]
   end
 
@@ -31,7 +31,6 @@ defmodule Website.MixProject do
       {:phoenix_live_view, "~> 0.20.1"},
       {:floki, "~> 0.36.0"},
       {:phoenix_live_dashboard, "~> 0.8.2"},
-      {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.2.0", runtime: Mix.env() == :dev},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
@@ -39,6 +38,7 @@ defmodule Website.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, ">= 0.0.0"},
+      {:finch, "~> 0.18"},
       {:mdex, "~> 0.2.0"},
       {:yaml_elixir, "~> 2.11.0"},
       {:tailwind_formatter, "~> 0.4.0", only: [:dev, :test], runtime: false},
@@ -53,11 +53,11 @@ defmodule Website.MixProject do
   defp aliases do
     [
       setup: ["deps.get", "assets.setup", "assets.build"],
-      "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.build": ["tailwind default", "esbuild default"],
+      "assets.setup": ["cmd --cd assets npm install"],
+      "assets.build": ["tailwind default", "cmd --cd assets npm run build"],
       "assets.deploy": [
         "tailwind default --minify",
-        "esbuild default --minify --loader:.ttf=file",
+        "cmd --cd assets npm run build",
         "phx.digest"
       ]
     ]

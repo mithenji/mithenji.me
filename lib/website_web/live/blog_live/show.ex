@@ -22,11 +22,15 @@ defmodule WebsiteWeb.BlogLive.Show do
       {:ok, _ref} = Presence.track(self(), topic(article), @presence_key, %{ip: get_ip(socket)})
     end
 
+    # 判断是否为 Livebook 文章
+    is_livebook = Blog.livebook_article?(article)
+
     socket =
       socket
       |> assign(:article, article)
       |> assign(:page_title, article.title)
       |> assign(:live_reading, live_reading)
+      |> assign(:is_livebook, is_livebook)
       |> SEO.assign(article)
 
     {:ok, socket}

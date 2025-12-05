@@ -38,12 +38,23 @@
             </span>
             <span class="relative inline-flex h-3 w-3 rounded-full bg-green-500"></span>
           </span>
+          <!-- Livebook 徽章 -->
+          <%= if @is_livebook do %>
+            <span class="livebook-badge ml-2">Interactive</span>
+          <% end %>
         </div>
       </div>
 
-      <article class="prose prose-base prose-p:text-base-content">
-        <%= raw(@article.body) %>
-      </article>
+      <!-- 根据文章类型使用不同的样式容器 -->
+      <%= if @is_livebook do %>
+        <article class="livebook-content">
+          <%= raw(@article.body) %>
+        </article>
+      <% else %>
+        <article class="prose prose-base prose-p:text-base-content">
+          <%= raw(@article.body) %>
+        </article>
+      <% end %>
     </div>
   </div>
 </div>

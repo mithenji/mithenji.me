@@ -539,8 +539,8 @@ defmodule WebsiteWeb.CoreComponents do
   defp main_navigation_links do
     [
       %{label: "Home", to: ~p"/"},
-      %{label: "About", to: ~p"/about"}
-      # %{label: "Blog", to: ~p"/blog"},
+      %{label: "About", to: ~p"/about"},
+      %{label: "Blog", to: ~p"/blog"},
       # %{label: "Projects", to: ~p"/projects"}
     ]
   end
