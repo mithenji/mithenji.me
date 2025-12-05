@@ -1,0 +1,123 @@
+/* Livebook 样式 - Elixir 数据探索入门 */
+
+.notebook {
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.cell {
+  margin: 1.5rem 0;
+}
+
+.cell-code {
+  background: #1e1e2e;
+  border-radius: 8px;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+.cell-code pre {
+  margin: 0;
+  color: #cdd6f4;
+  font-family: 'GeistMono', monospace;
+  font-size: 14px;
+}
+
+.cell-output {
+  background: #313244;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 0.5rem;
+  color: #a6adc8;
+}
+
+.markdown {
+  line-height: 1.7;
+}
+
+.markdown h2 {
+  color: #cba6f7;
+  margin-top: 2rem;
+}
+
+.markdown h3 {
+  color: #89b4fa;
+  margin-top: 1.5rem;
+}
+
+.markdown p {
+  margin: 1rem 0;
+}
+
+.markdown code {
+  background: #313244;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+.markdown ul {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+}
+
+.markdown li {
+  margin: 0.5rem 0;
+}
+
+/* Kino 表格 */
+.kino-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+
+.kino-table th,
+.kino-table td {
+  border: 1px solid #45475a;
+  padding: 0.75rem;
+  text-align: left;
+}
+
+.kino-table th {
+  background: #313244;
+  color: #cba6f7;
+}
+
+.kino-table tr:hover {
+  background: #313244;
+}
+
+/* VegaLite 图表 */
+.vega-chart {
+  background: #1e1e2e;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+/* 语法高亮 */
+.highlight-keyword {
+  color: #cba6f7;
+}
+
+.highlight-string {
+  color: #a6e3a1;
+}
+
+.highlight-number {
+  color: #fab387;
+}
+
+.highlight-comment {
+  color: #6c7086;
+  font-style: italic;
+}
+
+.highlight-function {
+  color: #89b4fa;
+}
+
+.highlight-atom {
+  color: #f9e2af;
+}
+

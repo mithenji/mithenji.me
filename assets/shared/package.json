@@ -1,0 +1,11 @@
+{
+  "name": "@website/shared",
+  "private": true,
+  "main": "tailwind.preset.js",
+  "dependencies": {
+    "@tailwindcss/typography": "^0.5.15",
+    "daisyui": "^4.12.14",
+    "tailwindcss": "^3.4.14"
+  }
+}
+

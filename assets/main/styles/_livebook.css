@@ -1,0 +1,74 @@
+/* Livebook 导出 HTML 的样式 */
+/* 这些样式确保 Livebook 内容在 Phoenix 博客中正确显示 */
+
+.livebook-content {
+  @apply prose prose-invert max-w-none;
+}
+
+/* Livebook notebook 容器 */
+.livebook-content .notebook {
+  @apply space-y-6;
+}
+
+/* Livebook 代码单元格 */
+.livebook-content .cell {
+  @apply rounded-lg overflow-hidden;
+}
+
+.livebook-content .cell-code {
+  @apply bg-base-300 p-4 rounded-lg;
+}
+
+.livebook-content .cell-code pre {
+  @apply m-0 bg-transparent;
+}
+
+/* Livebook 输出 */
+.livebook-content .cell-output {
+  @apply bg-base-200 p-4 rounded-lg mt-2;
+}
+
+/* Livebook Markdown 单元格 */
+.livebook-content .markdown {
+  @apply prose prose-invert max-w-none;
+}
+
+/* Livebook 图表/可视化 */
+.livebook-content .vega-embed {
+  @apply w-full;
+}
+
+/* Livebook Kino 输出 */
+.livebook-content .kino-output {
+  @apply bg-base-200 p-4 rounded-lg;
+}
+
+/* Livebook 表格 */
+.livebook-content table {
+  @apply w-full border-collapse;
+}
+
+.livebook-content th,
+.livebook-content td {
+  @apply border border-base-300 px-4 py-2;
+}
+
+.livebook-content th {
+  @apply bg-base-300;
+}
+
+/* Livebook 标签指示器 */
+.livebook-badge {
+  @apply inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-purple-500/20 text-purple-400;
+}
+
+.livebook-badge::before {
+  content: "📓";
+}
+
+/* 文章列表中的 Livebook 标签特殊样式 */
+.badge:has-text("Livebook"),
+span.badge:nth-child(1):contains("Livebook") {
+  @apply bg-purple-500/20 text-purple-400 border-purple-500/30;
+}
+

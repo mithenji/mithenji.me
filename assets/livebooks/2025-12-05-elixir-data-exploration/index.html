@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Getting Started with Elixir Data Exploration - Livebook</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="notebook">
+    <!-- Markdown cell -->
+    <div class="cell markdown">
+      <h1>Getting Started with Elixir Data Exploration</h1>
+      <p>
+        This document demonstrates how to use Elixir and Livebook for interactive data exploration.
+        We'll learn basic data processing, visualization, and analysis techniques.
+      </p>
+      <p><strong>What you'll learn:</strong></p>
+      <ul>
+        <li>Processing collection data with the Enum module</li>
+        <li>Creating interactive tables with Kino</li>
+        <li>Data visualization with VegaLite</li>
+      </ul>
+    </div>
+
+    <!-- Markdown cell -->
+    <div class="cell markdown">
+      <h2>Setup</h2>
+      <p>First, let's install the necessary dependencies:</p>
+    </div>
+
+    <!-- Code cell -->
+    <div class="cell">
+      <div class="cell-code">
+        <pre><span class="highlight-function">Mix.install</span>([
+  {<span class="highlight-atom">:kino</span>, <span class="highlight-string">"~> 0.12"</span>},
+  {<span class="highlight-atom">:vega_lite</span>, <span class="highlight-string">"~> 0.1"</span>},
+  {<span class="highlight-atom">:kino_vega_lite</span>, <span class="highlight-string">"~> 0.1"</span>}
+])</pre>
+      </div>
+      <div class="cell-output">
+        <pre>:ok</pre>
+      </div>
+    </div>
+
+    <!-- Markdown cell -->
+    <div class="cell markdown">
+      <h2>Creating Sample Data</h2>
+      <p>Let's create a dataset containing programming language popularity:</p>
+    </div>
+
+    <!-- Code cell -->
+    <div class="cell">
+      <div class="cell-code">
+        <pre><span class="highlight-comment"># Define programming language data</span>
+languages = [
+  %{<span class="highlight-atom">name:</span> <span class="highlight-string">"Elixir"</span>, <span class="highlight-atom">year:</span> <span class="highlight-number">2011</span>, <span class="highlight-atom">type:</span> <span class="highlight-string">"Functional"</span>, <span class="highlight-atom">popularity:</span> <span class="highlight-number">85</span>},
+  %{<span class="highlight-atom">name:</span> <span class="highlight-string">"Rust"</span>, <span class="highlight-atom">year:</span> <span class="highlight-number">2010</span>, <span class="highlight-atom">type:</span> <span class="highlight-string">"Systems"</span>, <span class="highlight-atom">popularity:</span> <span class="highlight-number">92</span>},
+  %{<span class="highlight-atom">name:</span> <span class="highlight-string">"Go"</span>, <span class="highlight-atom">year:</span> <span class="highlight-number">2009</span>, <span class="highlight-atom">type:</span> <span class="highlight-string">"Systems"</span>, <span class="highlight-atom">popularity:</span> <span class="highlight-number">88</span>},
+  %{<span class="highlight-atom">name:</span> <span class="highlight-string">"TypeScript"</span>, <span class="highlight-atom">year:</span> <span class="highlight-number">2012</span>, <span class="highlight-atom">type:</span> <span class="highlight-string">"Scripting"</span>, <span class="highlight-atom">popularity:</span> <span class="highlight-number">95</span>},
+  %{<span class="highlight-atom">name:</span> <span class="highlight-string">"Kotlin"</span>, <span class="highlight-atom">year:</span> <span class="highlight-number">2011</span>, <span class="highlight-atom">type:</span> <span class="highlight-string">"JVM"</span>, <span class="highlight-atom">popularity:</span> <span class="highlight-number">78</span>},
+  %{<span class="highlight-atom">name:</span> <span class="highlight-string">"Swift"</span>, <span class="highlight-atom">year:</span> <span class="highlight-number">2014</span>, <span class="highlight-atom">type:</span> <span class="highlight-string">"Mobile"</span>, <span class="highlight-atom">popularity:</span> <span class="highlight-number">82</span>}
+]</pre>
+      </div>
+      <div class="cell-output">
+        <pre>[
+  %{name: "Elixir", popularity: 85, type: "Functional", year: 2011},
+  %{name: "Rust", popularity: 92, type: "Systems", year: 2010},
+  %{name: "Go", popularity: 88, type: "Systems", year: 2009},
+  %{name: "TypeScript", popularity: 95, type: "Scripting", year: 2012},
+  %{name: "Kotlin", popularity: 78, type: "JVM", year: 2011},
+  %{name: "Swift", popularity: 82, type: "Mobile", year: 2014}
+]</pre>
+      </div>
+    </div>
+
+    <!-- Markdown cell -->
+    <div class="cell markdown">
+      <h2>Displaying Interactive Tables with Kino</h2>
+      <p>Kino can render data as beautiful interactive tables:</p>
+    </div>
+
+    <!-- Code cell + Kino table output -->
+    <div class="cell">
+      <div class="cell-code">
+        <pre><span class="highlight-function">Kino.DataTable.new</span>(languages)</pre>
+      </div>
+      <div class="cell-output">
+        <table class="kino-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Year</th>
+              <th>Type</th>
+              <th>Popularity</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Elixir</td><td>2011</td><td>Functional</td><td>85</td></tr>
+            <tr><td>Rust</td><td>2010</td><td>Systems</td><td>92</td></tr>
+            <tr><td>Go</td><td>2009</td><td>Systems</td><td>88</td></tr>
+            <tr><td>TypeScript</td><td>2012</td><td>Scripting</td><td>95</td></tr>
+            <tr><td>Kotlin</td><td>2011</td><td>JVM</td><td>78</td></tr>
+            <tr><td>Swift</td><td>2014</td><td>Mobile</td><td>82</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Markdown cell -->
+    <div class="cell markdown">
+      <h2>Data Processing and Analysis</h2>
+      <p>Using the Enum module for data filtering and transformation:</p>
+    </div>
+
+    <!-- Code cell -->
+    <div class="cell">
+      <div class="cell-code">
+        <pre><span class="highlight-comment"># Filter languages released after 2010 with popularity > 80</span>
+languages
+|> <span class="highlight-function">Enum.filter</span>(<span class="highlight-keyword">fn</span> lang -> lang.year >= <span class="highlight-number">2010</span> <span class="highlight-keyword">and</span> lang.popularity > <span class="highlight-number">80</span> <span class="highlight-keyword">end</span>)
+|> <span class="highlight-function">Enum.map</span>(<span class="highlight-keyword">fn</span> lang -> <span class="highlight-string">"#{lang.name} (#{lang.year})"</span> <span class="highlight-keyword">end</span>)</pre>
+      </div>
+      <div class="cell-output">
+        <pre>["Elixir (2011)", "Rust (2010)", "TypeScript (2012)", "Swift (2014)"]</pre>
+      </div>
+    </div>
+
+    <!-- Code cell -->
+    <div class="cell">
+      <div class="cell-code">
+        <pre><span class="highlight-comment"># Calculate average popularity</span>
+avg_popularity = 
+  languages
+  |> <span class="highlight-function">Enum.map</span>(& &1.popularity)
+  |> <span class="highlight-function">Enum.sum</span>()
+  |> <span class="highlight-function">Kernel./</span>(<span class="highlight-function">length</span>(languages))
+  |> <span class="highlight-function">Float.round</span>(<span class="highlight-number">1</span>)
+
+<span class="highlight-string">"Average popularity: #{avg_popularity}"</span></pre>
+      </div>
+      <div class="cell-output">
+        <pre>"Average popularity: 86.7"</pre>
+      </div>
+    </div>
+
+    <!-- Markdown cell -->
+    <div class="cell markdown">
+      <h2>Data Visualization</h2>
+      <p>Creating charts with VegaLite:</p>
+    </div>
+
+    <!-- Code cell + chart -->
+    <div class="cell">
+      <div class="cell-code">
+        <pre><span class="highlight-keyword">alias</span> VegaLite, <span class="highlight-atom">as:</span> Vl
+
+Vl.<span class="highlight-function">new</span>(<span class="highlight-atom">width:</span> <span class="highlight-number">500</span>, <span class="highlight-atom">height:</span> <span class="highlight-number">300</span>, <span class="highlight-atom">title:</span> <span class="highlight-string">"Programming Language Popularity"</span>)
+|> Vl.<span class="highlight-function">data_from_values</span>(languages)
+|> Vl.<span class="highlight-function">mark</span>(<span class="highlight-atom">:bar</span>)
+|> Vl.<span class="highlight-function">encode_field</span>(<span class="highlight-atom">:x</span>, <span class="highlight-string">"name"</span>, <span class="highlight-atom">type:</span> <span class="highlight-atom">:nominal</span>, <span class="highlight-atom">title:</span> <span class="highlight-string">"Language"</span>)
+|> Vl.<span class="highlight-function">encode_field</span>(<span class="highlight-atom">:y</span>, <span class="highlight-string">"popularity"</span>, <span class="highlight-atom">type:</span> <span class="highlight-atom">:quantitative</span>, <span class="highlight-atom">title:</span> <span class="highlight-string">"Popularity"</span>)
+|> Vl.<span class="highlight-function">encode_field</span>(<span class="highlight-atom">:color</span>, <span class="highlight-string">"type"</span>, <span class="highlight-atom">type:</span> <span class="highlight-atom">:nominal</span>)</pre>
+      </div>
+      <div class="cell-output vega-chart">
+        <!-- Simplified SVG chart representation -->
+        <svg viewBox="0 0 500 300" style="width: 100%; max-width: 500px;">
+          <rect x="0" y="0" width="500" height="300" fill="#1e1e2e"/>
+          <text x="250" y="25" fill="#cdd6f4" text-anchor="middle" font-size="16" font-weight="bold">Programming Language Popularity</text>
+          
+          <!-- Y axis -->
+          <line x1="60" y1="40" x2="60" y2="250" stroke="#45475a"/>
+          <text x="55" y="45" fill="#a6adc8" text-anchor="end" font-size="10">100</text>
+          <text x="55" y="145" fill="#a6adc8" text-anchor="end" font-size="10">50</text>
+          <text x="55" y="250" fill="#a6adc8" text-anchor="end" font-size="10">0</text>
+          
+          <!-- X axis -->
+          <line x1="60" y1="250" x2="480" y2="250" stroke="#45475a"/>
+          
+          <!-- Bar chart -->
+          <rect x="75" y="72" width="55" height="178" fill="#cba6f7" rx="4"/>
+          <rect x="145" y="34" width="55" height="216" fill="#89b4fa" rx="4"/>
+          <rect x="215" y="66" width="55" height="184" fill="#89b4fa" rx="4"/>
+          <rect x="285" y="51" width="55" height="199" fill="#a6e3a1" rx="4"/>
+          <rect x="355" y="88" width="55" height="162" fill="#f9e2af" rx="4"/>
+          <rect x="425" y="78" width="55" height="172" fill="#fab387" rx="4"/>
+          
+          <!-- X axis labels -->
+          <text x="102" y="270" fill="#a6adc8" text-anchor="middle" font-size="10">Elixir</text>
+          <text x="172" y="270" fill="#a6adc8" text-anchor="middle" font-size="10">Rust</text>
+          <text x="242" y="270" fill="#a6adc8" text-anchor="middle" font-size="10">Go</text>
+          <text x="312" y="270" fill="#a6adc8" text-anchor="middle" font-size="10">TS</text>
+          <text x="382" y="270" fill="#a6adc8" text-anchor="middle" font-size="10">Kotlin</text>
+          <text x="452" y="270" fill="#a6adc8" text-anchor="middle" font-size="10">Swift</text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Markdown cell -->
+    <div class="cell markdown">
+      <h2>Summary</h2>
+      <p>In this Livebook document, we learned:</p>
+      <ul>
+        <li>How to create and process Elixir data structures</li>
+        <li>Using the <code>Enum</code> module for data filtering and transformation</li>
+        <li>Using <code>Kino</code> to display interactive tables</li>
+        <li>Using <code>VegaLite</code> to create data visualizations</li>
+      </ul>
+      <p>
+        <strong>Next steps:</strong> Try modifying the code, adding more data, or creating different types of charts!
+      </p>
+    </div>
+
+    <!-- Markdown cell -->
+    <div class="cell markdown">
+      <h3>Related Resources</h3>
+      <ul>
+        <li><a href="https://livebook.dev" style="color: #89b4fa;">Livebook Official Website</a></li>
+        <li><a href="https://hexdocs.pm/kino" style="color: #89b4fa;">Kino Documentation</a></li>
+        <li><a href="https://hexdocs.pm/vega_lite" style="color: #89b4fa;">VegaLite Documentation</a></li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>
