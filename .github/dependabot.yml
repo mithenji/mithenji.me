@@ -1,0 +1,64 @@
+version: 2
+updates:
+  # GitHub Actions 自动更新
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Shanghai"
+    # 限制每次最多创建的 PR 数量
+    open-pull-requests-limit: 5
+    # 自动将 PR 分配给仓库维护者
+    assignees:
+      - "mithenji"
+    # PR 标签
+    labels:
+      - "dependencies"
+      - "github-actions"
+    # 提交信息前缀
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+
+  # Elixir/Hex 依赖自动更新
+  - package-ecosystem: "mix"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Shanghai"
+    open-pull-requests-limit: 10
+    assignees:
+      - "mithenji"
+    labels:
+      - "dependencies"
+      - "elixir"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    # 忽略主版本更新（可选，避免破坏性变更）
+    # ignore:
+    #   - dependency-name: "*"
+    #     update-types: ["version-update:semver-major"]
+
+  # npm 依赖自动更新（assets 目录）
+  - package-ecosystem: "npm"
+    directory: "/assets"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Shanghai"
+    open-pull-requests-limit: 5
+    assignees:
+      - "mithenji"
+    labels:
+      - "dependencies"
+      - "javascript"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+

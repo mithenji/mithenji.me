@@ -4,6 +4,8 @@ on:
   push:
     branches: [ 'main' ]
     tags: [ 'v*' ]
+  pull_request:
+    branches: [ 'main' ]
 
 env:
   REGISTRY: ghcr.io
@@ -61,6 +63,8 @@ jobs:
       - name: Run Tests
         run: mix test
   build:
+    # 仅在 push 事件时构建镜像（PR 只运行测试）
+    if: github.event_name == 'push'
     name: Build and push image to ghcr
     needs: test
     runs-on: ubuntu-latest
@@ -81,7 +85,7 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_TOKEN }}
+          password: ${{ secrets.GHCR_MITHEN_TOKEN }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@c47758b77c9736f4b2ef4073d4d51994fabfe349 # v3
@@ -115,12 +119,21 @@ jobs:
       HOST: ${{ secrets.ECS_HOST }}
       USER: ${{ secrets.ECS_USER }}
       SSH_KEY: ${{ secrets.ECS_SSH_KEY }}
-      DOCKER_PASSWORD: ${{ secrets.GHCR_TOKEN }}
+      DOCKER_PASSWORD: ${{ secrets.GHCR_MITHEN_TOKEN }}
       IMAGE_TAG: ${{ github.sha }}
 
     steps:
+      - name: Lowercase image name
+        run: echo "IMAGE_NAME=$(echo "$IMAGE_NAME" | awk '{print tolower($0)}')" >> $GITHUB_ENV
+
       - name: Deploy to ECS via SSH
         run: |
+          # 构建镜像标签（使用短 SHA
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          DEPLOY_IMAGE="${REGISTRY}/${IMAGE_NAME}:sha-${SHORT_SHA}"
+          
+          echo "Will deploy image: $DEPLOY_IMAGE"
+          
           # 配置 SSH 以保持连接活跃
           mkdir -p ~/.ssh
           echo "ServerAliveInterval 30" >> ~/.ssh/config
@@ -128,27 +141,32 @@ jobs:
           
           eval "$(ssh-agent -s)"
           echo "$SSH_KEY" | tr -d '\r' | ssh-add -
-          ssh -o StrictHostKeyChecking=no $USER@$HOST << EOF
-            # 使用提交 SHA 作为镜像标签以确保部署确定性
-            IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-$(echo ${{ github.sha }} | cut -c1-7)
+          
+          # 通过环境变量安全传递敏感信息到远程服务器
+          # 使用带引号的 heredoc 防止本地变量展开，通过 SSH 命令行传递变量
+          ssh -o StrictHostKeyChecking=no "$USER@$HOST" \
+            DOCKER_TOKEN="$DOCKER_PASSWORD" \
+            DEPLOY_IMAGE="$DEPLOY_IMAGE" \
+            bash << 'DEPLOY_SCRIPT'
+            set -e
             
-            echo "Debug information:"
-            echo "Registry: ${{ env.REGISTRY }}"
-            echo "Image name: ${{ env.IMAGE_NAME }}"
-            echo "Full image path: \$IMAGE"
+            # 使用传入的镜像路径
+            IMAGE="$DEPLOY_IMAGE"
             
-            # 登录 Docker registry
-            echo "${{ secrets.GHCR_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
+            echo "Deploy information:"
+            echo "Full image path: $IMAGE"
+            
+            # 登录 Docker registrytoken 通过环境变量安全传递
+            echo "$DOCKER_TOKEN" | docker login ghcr.io -u mithenji --password-stdin
             
             # 设置环境变量供 docker-compose 使用
-            export IMAGE_NAME=\$IMAGE
+            export IMAGE_NAME="$IMAGE"
             
             # 指定工作目录
             cd /home/mithenji/
-
             echo "停止并删除旧容器..."
-            docker-compose stop mithenji.me
-            docker-compose rm -f mithenji.me
+            docker-compose stop mithenji.me || true
+            docker-compose rm -f mithenji.me || true
             
             echo "拉取最新镜像..."
             docker-compose pull mithenji.me
@@ -157,5 +175,9 @@ jobs:
             docker-compose up -d mithenji.me
             
             echo "清理未使用的镜像..."
-            docker images "ghcr.io/mithenji/mithenji.me" --format "{{.ID}}" | grep -v $(docker inspect --format='{{.Image}}' mithenji.me) | xargs -r docker rmi
-          EOF
+            docker images "ghcr.io/mithenji/mithenji.me" --format "{{.ID}}" | \
+              grep -v "$(docker inspect --format='{{.Image}}' mithenji.me 2>/dev/null || echo 'none')" | \
+              xargs -r docker rmi || true
+            
+            echo "部署完成!"
+DEPLOY_SCRIPT
