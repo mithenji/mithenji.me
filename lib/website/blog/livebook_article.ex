@@ -25,7 +25,8 @@ defmodule Website.Blog.LivebookArticle do
     :read_minutes,
     :heading_links,
     :published,
-    :type  # :livebook
+    # :livebook
+    :type
   ]
 
   @doc """
@@ -108,11 +109,15 @@ defmodule Website.Blog.LivebookArticle do
     # Livebook 导出的 HTML 结构: <div class="notebook">...</div>
     body =
       case Floki.find(parsed, ".notebook") do
-        [notebook | _] -> Floki.raw_html(notebook)
+        [notebook | _] ->
+          Floki.raw_html(notebook)
+
         _ ->
           # 备选: 提取 <main> 或 <body> 内容
           case Floki.find(parsed, "main") do
-            [main | _] -> Floki.raw_html(main)
+            [main | _] ->
+              Floki.raw_html(main)
+
             _ ->
               case Floki.find(parsed, "body") do
                 [{_, _, children} | _] -> Floki.raw_html(children)

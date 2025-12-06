@@ -540,7 +540,7 @@ defmodule WebsiteWeb.CoreComponents do
     [
       %{label: "Home", to: ~p"/"},
       %{label: "About", to: ~p"/about"},
-      %{label: "Blog", to: ~p"/blog"},
+      %{label: "Blog", to: ~p"/blog"}
       # %{label: "Projects", to: ~p"/projects"}
     ]
   end
