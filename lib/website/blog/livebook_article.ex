@@ -98,45 +98,45 @@ defmodule Website.Blog.LivebookArticle do
   defp extract_content(html) do
     parsed = Floki.parse_document!(html)
 
-    # 提取标题 (从 <title> 或 <h1>)
-    title =
-      case Floki.find(parsed, "title") do
-        [{_, _, [text]} | _] -> text |> String.trim() |> String.replace(" - Livebook", "")
-        _ -> extract_first_heading(parsed)
-      end
-
-    # 提取主体内容
-    # Livebook 导出的 HTML 结构: <div class="notebook">...</div>
-    body =
-      case Floki.find(parsed, ".notebook") do
-        [notebook | _] ->
-          Floki.raw_html(notebook)
-
-        _ ->
-          # 备选: 提取 <main> 或 <body> 内容
-          case Floki.find(parsed, "main") do
-            [main | _] ->
-              Floki.raw_html(main)
-
-            _ ->
-              case Floki.find(parsed, "body") do
-                [{_, _, children} | _] -> Floki.raw_html(children)
-                _ -> ""
-              end
-          end
-      end
-
-    # 提取描述 (第一段文字)
-    description =
-      parsed
-      |> Floki.find("p")
-      |> List.first()
-      |> case do
-        nil -> ""
-        elem -> Floki.text(elem) |> String.slice(0, 200)
-      end
+    title = extract_title(parsed)
+    body = extract_body(parsed)
+    description = extract_description(parsed)
 
     {title, body, description}
+  end
+
+  defp extract_title(parsed) do
+    case Floki.find(parsed, "title") do
+      [{_, _, [text]} | _] -> text |> String.trim() |> String.replace(" - Livebook", "")
+      _ -> extract_first_heading(parsed)
+    end
+  end
+
+  defp extract_body(parsed) do
+    # Livebook 导出的 HTML 结构: <div class="notebook">...</div>
+    with [] <- Floki.find(parsed, ".notebook"),
+         [] <- Floki.find(parsed, "main") do
+      extract_body_fallback(parsed)
+    else
+      [element | _] -> Floki.raw_html(element)
+    end
+  end
+
+  defp extract_body_fallback(parsed) do
+    case Floki.find(parsed, "body") do
+      [{_, _, children} | _] -> Floki.raw_html(children)
+      _ -> ""
+    end
+  end
+
+  defp extract_description(parsed) do
+    parsed
+    |> Floki.find("p")
+    |> List.first()
+    |> case do
+      nil -> ""
+      elem -> Floki.text(elem) |> String.slice(0, 200)
+    end
   end
 
   defp extract_first_heading(parsed) do
@@ -162,21 +162,25 @@ defmodule Website.Blog.LivebookArticle do
   defp parse_headings(body) do
     body
     |> Floki.parse_fragment!()
-    |> Enum.reduce([], fn
-      {"h2", _attrs, _children} = el, acc ->
-        acc ++ [%{label: Floki.text(el), href: nil, childs: []}]
+    |> Enum.reduce([], &process_heading_element/2)
+  end
 
-      {"h3", _attrs, _children} = el, acc ->
-        if acc == [] do
-          acc
-        else
-          List.update_at(acc, -1, fn %{childs: subs} = h2 ->
-            %{h2 | childs: subs ++ [%{label: Floki.text(el), href: nil, childs: []}]}
-          end)
-        end
+  defp process_heading_element({"h2", _attrs, _children} = el, acc) do
+    acc ++ [%{label: Floki.text(el), href: nil, childs: []}]
+  end
 
-      _other, acc ->
-        acc
-    end)
+  defp process_heading_element({"h3", _attrs, _children} = el, []) do
+    []
+  end
+
+  defp process_heading_element({"h3", _attrs, _children} = el, acc) do
+    List.update_at(acc, -1, &add_child_heading(&1, el))
+  end
+
+  defp process_heading_element(_other, acc), do: acc
+
+  defp add_child_heading(%{childs: subs} = h2, el) do
+    child = %{label: Floki.text(el), href: nil, childs: []}
+    %{h2 | childs: subs ++ [child]}
   end
 end
