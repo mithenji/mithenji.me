@@ -169,7 +169,7 @@ defmodule Website.Blog.LivebookArticle do
     acc ++ [%{label: Floki.text(el), href: nil, childs: []}]
   end
 
-  defp process_heading_element({"h3", _attrs, _children} = el, []) do
+  defp process_heading_element({"h3", _attrs, _children}, []) do
     []
   end
 
