@@ -128,7 +128,7 @@ jobs:
 
       - name: Deploy to ECS via SSH
         run: |
-          # 构建镜像标签（使用短 SHA
+          # 构建镜像标签（使用短 SHA）
           SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
           DEPLOY_IMAGE="${REGISTRY}/${IMAGE_NAME}:sha-${SHORT_SHA}"
           
@@ -142,42 +142,27 @@ jobs:
           eval "$(ssh-agent -s)"
           echo "$SSH_KEY" | tr -d '\r' | ssh-add -
           
-          # 通过环境变量安全传递敏感信息到远程服务器
-          # 使用带引号的 heredoc 防止本地变量展开，通过 SSH 命令行传递变量
-          ssh -o StrictHostKeyChecking=no "$USER@$HOST" \
-            DOCKER_TOKEN="$DOCKER_PASSWORD" \
-            DEPLOY_IMAGE="$DEPLOY_IMAGE" \
-            bash << 'EOF'
+          # 创建部署脚本
+          cat > /tmp/deploy.sh << 'SCRIPT_END'
           set -e
-          
-          # 使用传入的镜像路径
           IMAGE="$DEPLOY_IMAGE"
-          
           echo "Deploy information:"
           echo "Full image path: $IMAGE"
-          
-          # 登录 Docker registry（token 通过环境变量安全传递）
           echo "$DOCKER_TOKEN" | docker login ghcr.io -u mithenji --password-stdin
-          
-          # 设置环境变量供 docker-compose 使用
           export IMAGE_NAME="$IMAGE"
-          
-          # 指定工作目录
           cd /home/mithenji/
           echo "停止并删除旧容器..."
           docker-compose stop mithenji.me || true
           docker-compose rm -f mithenji.me || true
-          
           echo "拉取最新镜像..."
           docker-compose pull mithenji.me
-          
           echo "更新服务..."
           docker-compose up -d mithenji.me
-          
           echo "清理未使用的镜像..."
-          docker images "ghcr.io/mithenji/mithenji.me" --format "{{.ID}}" | \
-            grep -v "$(docker inspect --format='{{.Image}}' mithenji.me 2>/dev/null || echo 'none')" | \
-            xargs -r docker rmi || true
-          
+          docker images "ghcr.io/mithenji/mithenji.me" --format "{{.ID}}" | grep -v "$(docker inspect --format='{{.Image}}' mithenji.me 2>/dev/null || echo 'none')" | xargs -r docker rmi || true
           echo "部署完成!"
-EOF
+          SCRIPT_END
+          
+          # 通过 SSH 执行部署脚本
+          ssh -o StrictHostKeyChecking=no "$USER@$HOST" \
+            "DOCKER_TOKEN='$DOCKER_PASSWORD' DEPLOY_IMAGE='$DEPLOY_IMAGE' bash -s" < /tmp/deploy.sh
