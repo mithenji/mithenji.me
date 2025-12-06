@@ -150,7 +150,7 @@ jobs:
           echo "Full image path: $IMAGE"
           echo "$DOCKER_TOKEN" | docker login ghcr.io -u mithenji --password-stdin
           export IMAGE_NAME="$IMAGE"
-          cd /home/mithenji/
+          cd /srv/blog/compose/
           echo "停止并删除旧容器..."
           docker-compose stop mithenji.me || true
           docker-compose rm -f mithenji.me || true
