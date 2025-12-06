@@ -84,8 +84,9 @@ RUN chown nobody:nogroup /app
 
 # set runner ENV
 ENV MIX_ENV="prod"
-ENV PHX_HOST=${PHX_HOST}
-ENV SECRET_KEY_BASE=${SECRET_KEY_BASE}
+
+# PHX_HOST 和 SECRET_KEY_BASE 应在运行时通过环境变量设置
+# 例如: docker run -e PHX_HOST=example.com -e SECRET_KEY_BASE=xxx ...
 
 # Only copy the final release from the build stage
 COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/website ./
