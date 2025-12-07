@@ -85,7 +85,7 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_MITHEN_TOKEN }}
+          password: ${{ secrets.GHCR_TOKEN }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # v3.8.0
@@ -119,7 +119,7 @@ jobs:
       HOST: ${{ secrets.ECS_HOST }}
       USER: ${{ secrets.ECS_USER }}
       SSH_KEY: ${{ secrets.ECS_SSH_KEY }}
-      DOCKER_PASSWORD: ${{ secrets.GHCR_MITHEN_TOKEN }}
+      DOCKER_PASSWORD: ${{ secrets.GHCR_TOKEN }}
       IMAGE_TAG: ${{ github.sha }}
 
     steps:
