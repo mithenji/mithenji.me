@@ -43,6 +43,7 @@ defmodule WebsiteWeb.SEO do
   """
   def site_config(conn) do
     SEO.Site.build(
+      default_title: "天蓝色的岛",
       canonical_url: conn.assigns.current_url,
       description:
         "Personal website and blog of Mithen Ji, a software developer and computer science student."
