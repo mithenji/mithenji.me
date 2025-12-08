@@ -254,6 +254,15 @@ defmodule WebsiteWeb.CoreComponents do
             </.link>
           </nav>
         </div>
+        <div class="mt-4 flex w-full justify-center">
+          <.link
+            href="https://beian.miit.gov.cn"
+            target="_blank"
+            class="text-sm opacity-60 hover:opacity-100 hover:text-primary transition-opacity"
+          >
+            粤ICP备2024329871号-1
+          </.link>
+        </div>
       </div>
     </footer>
     """
@@ -539,7 +548,7 @@ defmodule WebsiteWeb.CoreComponents do
   defp main_navigation_links do
     [
       %{label: "Home", to: ~p"/"},
-      %{label: "About", to: ~p"/about"},
+      # %{label: "About", to: ~p"/about"},
       %{label: "Blog", to: ~p"/blog"}
       # %{label: "Projects", to: ~p"/projects"}
     ]
