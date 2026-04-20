@@ -43,7 +43,7 @@ defmodule Website.MixProject do
       {:yaml_elixir, "~> 2.11.0"},
       {:tailwind_formatter, "~> 0.4.0", only: [:dev, :test], runtime: false},
       {:nimble_publisher, "~> 1.1.0"},
-      {:phoenix_seo, "~> 0.1.9"},
+      {:phoenix_seo, "~> 0.2.1"},
       {:atomex, "0.5.1"},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:appsignal_phoenix, "~> 2.4"}
